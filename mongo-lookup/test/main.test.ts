@@ -16,7 +16,7 @@ describe("operation", () => {
     before(() => {
         return prepareOperation(null)
             .then(preparedOperation => operation = preparedOperation)
-            .then(() => MongoClient.connect("mongodb://localhost:27017").then(instance => database = instance));
+            .then(() => MongoClient.connect("mongodb://localhost:27017/database").then(instance => database = instance));
     });
 
     after(() => {

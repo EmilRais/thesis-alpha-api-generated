@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { MongoClient } from "mongodb";
 
 export const prepareOperation = (abstractOperation: any) => {
-    return MongoClient.connect("mongodb://mongo:27017")
+    return MongoClient.connect("mongodb://mongo:27017/database")
         .then(database => {
 
             const concreteOperation: RequestHandler = (request, response, next) => {
