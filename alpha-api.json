@@ -3,7 +3,7 @@
         "method": "GET",
         "path": "/board/get",
         "operations": [
-            { "module": "mongo-lookup" },
+            { "module": "mongo-lookup", "collection": "Boards" },
             { "module": "response" }
         ]
     }
