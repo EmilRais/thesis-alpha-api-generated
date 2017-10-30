@@ -6,5 +6,13 @@
             { "module": "mongo-lookup", "collection": "Boards" },
             { "module": "response" }
         ]
+    },
+    {
+        "method": "GET",
+        "path": "/user/get",
+        "operations": [
+            { "module": "mongo-lookup", "collection": "Users" },
+            { "module": "response" }
+        ]
     }
 ]
