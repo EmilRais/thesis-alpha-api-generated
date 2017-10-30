@@ -1,4 +1,4 @@
-import { All, MandatoryFields, Object, RecognisedFields, Required, String } from "paradise";
+import { All, MandatoryFields, Object, RecognisedFields, Required, Size, String } from "paradise";
 
 export const BoardRule = () => {
     return All([
@@ -6,8 +6,8 @@ export const BoardRule = () => {
         Object(),
         RecognisedFields(["name", "image"]),
         MandatoryFields({
-            name: [Required(), String()],
-            image: [Required(), String()]
+            name: [Required(), String(), Size({ above: 0 })],
+            image: [Required(), String(), Size({ above: 0 })]
         })
     ]);
 };

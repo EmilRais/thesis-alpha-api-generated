@@ -31,6 +31,13 @@ describe("BoardRule", () => {
             .catch(error => error.should.deep.equal(['"$.name" was not a string']));
     });
 
+    it("should fail if name is the empty string", () => {
+        const board = { name: "", image: "some-image" };
+        return BoardRule().guard(board)
+            .then(() => Promise.reject("Expected failure"))
+            .catch(error => error.should.deep.equal(['"$.name" was 0 characters long but should be longer than 0']));
+    });
+
     it("should fail if image is missing", () => {
         const board = { name: "some-name" };
         return BoardRule().guard(board)
@@ -43,6 +50,13 @@ describe("BoardRule", () => {
         return BoardRule().guard(board)
             .then(() => Promise.reject("Expected failure"))
             .catch(error => error.should.deep.equal(['"$.image" was not a string']));
+    });
+
+    it("should fail if image is the empty string", () => {
+        const board = { name: "some-name", image: "" };
+        return BoardRule().guard(board)
+            .then(() => Promise.reject("Expected failure"))
+            .catch(error => error.should.deep.equal(['"$.image" was 0 characters long but should be longer than 0']));
     });
 
     it("should succeed if board is valid", () => {
