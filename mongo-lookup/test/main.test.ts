@@ -9,66 +9,82 @@ import * as agent from "superagent";
 import { AbstractOperation, prepareOperation } from "../source/main";
 
 describe("operation", () => {
-
-    let operation: RequestHandler;
     let database: Db;
 
     before(() => {
-        const abstractOperation: AbstractOperation = { module: "mongo-lookup", collection: "Boards", host: "localhost" };
-        return prepareOperation(abstractOperation)
-            .then(preparedOperation => operation = preparedOperation)
-            .then(() => MongoClient.connect("mongodb://localhost:27017/database").then(instance => database = instance));
+        return MongoClient.connect("mongodb://localhost:27017/database").then(db => database = db);
     });
 
     after(() => {
-        (operation as any).database.close();
         database.close();
     });
 
+    it("should fail if collection has not been specified", () => {
+        const abstractOperation: AbstractOperation = { module: "mongo-lookup", collection: null };
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                (operation as any).database.close();
+                return Promise.reject("Expected failure");
+            })
+            .catch(error => {
+                error.should.equal("mongo-lookup expected a collection");
+            });
+    });
+
     it("should update response.locals.boards if boards collection is empty", () => {
-        return new Promise((resolve, reject) => {
-            express()
-                .use(operation)
-                .use(returnBoards)
-                .listen(3030, function() {
-                    const runningServer = this;
-                    agent.get("localhost:3030")
-                        .catch(error => error.response)
-                        .then(response => {
-                            runningServer.close();
-                            response.body.should.deep.equal([]);
-                            resolve();
-                        })
-                        .catch(reject);
+        const abstractOperation: AbstractOperation = { module: "mongo-lookup", collection: "Boards", host: "localhost" };
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(operation)
+                        .use(returnBoards)
+                        .listen(3030, function() {
+                            const runningServer = this;
+                            agent.get("localhost:3030")
+                                .catch(error => error.response)
+                                .then(response => {
+                                    (operation as any).database.close();
+                                    runningServer.close();
+                                    response.body.should.deep.equal([]);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
                 });
-        });
+            });
     });
 
     it("should update response.locals.boards if boards collection is not empty", () => {
-        return new Promise((resolve, reject) => {
-            express()
-                .use(operation)
-                .use(returnBoards)
-                .listen(3030, function() {
-                    const runningServer = this;
+        const abstractOperation: AbstractOperation = { module: "mongo-lookup", collection: "Boards", host: "localhost" };
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(operation)
+                        .use(returnBoards)
+                        .listen(3030, function() {
+                            const runningServer = this;
 
-                    const boards = [
-                        { _id: "1", name: "some-board-1" },
-                        { _id: "2", name: "some-board-2" }
-                    ];
+                            const boards = [
+                                { _id: "1", name: "some-board-1" },
+                                { _id: "2", name: "some-board-2" }
+                            ];
 
-                    database.collection("Boards").insert(boards).then(() => {
-                        agent.get("localhost:3030")
-                            .catch(error => error.response)
-                            .then(response => {
-                                runningServer.close();
-                                response.body.should.deep.equal(boards);
-                                resolve();
-                            })
-                            .catch(reject);
-                    });
+                            database.collection("Boards").insert(boards).then(() => {
+                                agent.get("localhost:3030")
+                                    .catch(error => error.response)
+                                    .then(response => {
+                                        (operation as any).database.close();
+                                        runningServer.close();
+                                        response.body.should.deep.equal(boards);
+                                        resolve();
+                                    })
+                                    .catch(reject);
+                            });
+                        });
                 });
-        });
+            });
     });
 });
 

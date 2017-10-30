@@ -9,6 +9,8 @@ export interface AbstractOperation {
 
 export const prepareOperation = (abstractOperation: AbstractOperation) => {
     const collection = abstractOperation.collection;
+    if ( !collection ) return Promise.reject("mongo-lookup expected a collection");
+
     const host = abstractOperation.host || "mongo";
 
     return MongoClient.connect(`mongodb://${host}:27017/database`)
