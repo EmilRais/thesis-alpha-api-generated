@@ -1,12 +1,21 @@
 import { RequestHandler } from "express";
 import { MongoClient } from "mongodb";
 
-export const prepareOperation = (abstractOperation: any) => {
-    return MongoClient.connect("mongodb://mongo:27017/database")
+export interface AbstractOperation {
+    module: string;
+    collection: string;
+    host?: string;
+}
+
+export const prepareOperation = (abstractOperation: AbstractOperation) => {
+    const collection = abstractOperation.collection;
+    const host = abstractOperation.host || "mongo";
+
+    return MongoClient.connect(`mongodb://${host}:27017/database`)
         .then(database => {
 
             const concreteOperation: RequestHandler = (request, response, next) => {
-                database.collection("Boards").find().toArray()
+                database.collection(collection).find().toArray()
                     .then(boards => {
                         response.locals.boards = boards;
                         next();

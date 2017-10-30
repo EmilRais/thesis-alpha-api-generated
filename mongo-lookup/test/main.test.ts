@@ -6,7 +6,7 @@ import * as express from "express";
 import { Db, MongoClient } from "mongodb";
 import * as agent from "superagent";
 
-import { prepareOperation } from "../source/main";
+import { AbstractOperation, prepareOperation } from "../source/main";
 
 describe("operation", () => {
 
@@ -14,7 +14,8 @@ describe("operation", () => {
     let database: Db;
 
     before(() => {
-        return prepareOperation(null)
+        const abstractOperation: AbstractOperation = { module: "mongo-lookup", collection: "Boards", host: "localhost" };
+        return prepareOperation(abstractOperation)
             .then(preparedOperation => operation = preparedOperation)
             .then(() => MongoClient.connect("mongodb://localhost:27017/database").then(instance => database = instance));
     });
