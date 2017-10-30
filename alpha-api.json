@@ -8,6 +8,15 @@
         ]
     },
     {
+        "method": "POST",
+        "path": "/board/create",
+        "operations": [
+            { "module": "validation" },
+            { "module": "mongo-store" },
+            { "module": "response", "status": 201 }
+        ]
+    },
+    {
         "method": "GET",
         "path": "/user/get",
         "operations": [
