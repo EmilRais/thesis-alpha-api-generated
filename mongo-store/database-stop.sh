@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker rm -f mongo-lookup-database
+docker rm -f mongo-store-database

@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 export interface AbstractOperation {
     module: string;
@@ -17,8 +17,16 @@ export const prepareOperation = (abstractOperation: AbstractOperation) => {
         .then(database => {
 
             const concreteOperation: RequestHandler = (request, response, next) => {
-                database.collection(collection).insert(request.body)
-                    .then(() => next())
+                if ( request.body instanceof Array ) return next(new Error("mongo-store cannot store arrays"));
+
+                const document = Object.assign({}, request.body);
+                document._id = new ObjectId().toHexString();
+
+                database.collection(collection).insert(document)
+                    .then(() => {
+                        response.locals.boards = document;
+                        next();
+                    })
                     .catch(next);
             };
 

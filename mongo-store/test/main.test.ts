@@ -2,7 +2,7 @@ import * as chai from "chai";
 const should = chai.should();
 
 import { json } from "body-parser";
-import { RequestHandler } from "express";
+import { ErrorRequestHandler, RequestHandler } from "express";
 import * as express from "express";
 import { Db, MongoClient } from "mongodb";
 import * as agent from "superagent";
@@ -16,8 +16,12 @@ describe("operation", () => {
         return MongoClient.connect("mongodb://localhost:27017/database").then(db => database = db);
     });
 
+    afterEach(() => {
+        return database.dropDatabase();
+    });
+
     after(() => {
-        database.close();
+        return database.close();
     });
 
     it("should fail if collection has not been specified", () => {
@@ -29,8 +33,38 @@ describe("operation", () => {
             });
     });
 
+    it("should fail if input is an array", () => {
+        const abstractOperation: AbstractOperation = { module: "mongo-store", collection: "Boards", host: "localhost" };
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(operation)
+                        .use(errorHandler)
+                        .listen(3030, function() {
+                            const runningServer = this;
+
+                            const boards = [{ name: "some-board" }];
+
+                            agent.post("localhost:3030")
+                                .send(boards)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    (operation as any).database.close();
+                                    runningServer.close();
+
+                                    response.text.should.equal("mongo-store cannot store arrays");
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
     it("should store request.body in boards collection", () => {
-        const abstractOperation: AbstractOperation = { module: "mongo-store", collection: "Users", host: "localhost" };
+        const abstractOperation: AbstractOperation = { module: "mongo-store", collection: "Boards", host: "localhost" };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
@@ -40,21 +74,18 @@ describe("operation", () => {
                         .listen(3030, function() {
                             const runningServer = this;
 
-                            const boards = [
-                                { _id: "1", name: "some-board-1" },
-                                { _id: "2", name: "some-board-2" }
-                            ];
+                            const board = { name: "some-board" };
 
                             agent.post("localhost:3030")
-                                .send(boards)
+                                .send(board)
                                 .catch(error => error.response)
                                 .then(response => {
                                     (operation as any).database.close();
                                     runningServer.close();
 
-                                    return database.collection("Users").find().toArray()
-                                        .then((storedBoards: any) => {
-                                            storedBoards.should.deep.equal(boards);
+                                    return database.collection("Boards").find({}, { _id: false }).toArray()
+                                        .then((boards: any) => {
+                                            boards.should.deep.equal([board]);
                                             resolve();
                                         });
                                 })
@@ -63,4 +94,45 @@ describe("operation", () => {
                 });
             });
     });
+
+    it("should store resulting object in response.locals.boards", () => {
+        const abstractOperation: AbstractOperation = { module: "mongo-store", collection: "Boards", host: "localhost" };
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(operation)
+                        .use(responseHandler)
+                        .listen(3030, function() {
+                            const runningServer = this;
+
+                            const board = { name: "some-board" };
+
+                            agent.post("localhost:3030")
+                                .send(board)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    (operation as any).database.close();
+                                    runningServer.close();
+
+                                    response.body._id.should.be.a.string;
+
+                                    delete response.body._id;
+                                    response.body.should.deep.equal(board);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
 });
+
+const responseHandler: RequestHandler = (request, response, next) => {
+    response.status(200).json(response.locals.boards);
+};
+
+const errorHandler: ErrorRequestHandler = (error, request, response, next) => {
+    response.status(500).end(error.message);
+};
