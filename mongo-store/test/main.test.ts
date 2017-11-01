@@ -20,8 +20,17 @@ describe("operation", () => {
         database.close();
     });
 
+    it("should fail if collection has not been specified", () => {
+        const abstractOperation: AbstractOperation = { module: "mongo-store", collection: "" };
+        return prepareOperation(abstractOperation)
+            .then(() => Promise.reject("Expected failure"))
+            .catch(error => {
+                error.should.equal("mongo-store expected a collection");
+            });
+    });
+
     it("should store request.body in boards collection", () => {
-        const abstractOperation: AbstractOperation = { module: "mongo-store", host: "localhost" };
+        const abstractOperation: AbstractOperation = { module: "mongo-store", collection: "Users", host: "localhost" };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
@@ -43,7 +52,7 @@ describe("operation", () => {
                                     (operation as any).database.close();
                                     runningServer.close();
 
-                                    return database.collection("Boards").find().toArray()
+                                    return database.collection("Users").find().toArray()
                                         .then((storedBoards: any) => {
                                             storedBoards.should.deep.equal(boards);
                                             resolve();

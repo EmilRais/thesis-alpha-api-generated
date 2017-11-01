@@ -12,7 +12,7 @@
         "path": "/board/create",
         "operations": [
             { "module": "validation" },
-            { "module": "mongo-store" },
+            { "module": "mongo-store", "collection": "Boards" },
             { "module": "response", "status": 201 }
         ]
     },
