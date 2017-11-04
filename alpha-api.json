@@ -11,7 +11,7 @@
         "method": "POST",
         "path": "/board/create",
         "operations": [
-            { "module": "validation" },
+            { "module": "validation", "schema": "board" },
             { "module": "mongo-store", "collection": "Boards" },
             { "module": "response", "status": 201 }
         ]
