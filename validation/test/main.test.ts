@@ -7,7 +7,7 @@ import * as express from "express";
 import { Server } from "http";
 import * as agent from "superagent";
 
-import { AbstractOperation, prepareOperation } from "../source/main";
+import { AbstractOperation, FacebookToken, prepareOperation } from "../source/main";
 
 describe("operation", () => {
 
@@ -20,6 +20,7 @@ describe("operation", () => {
                     express()
                         .use(json())
                         .use(operation)
+                        .use(success())
                         .listen(3030, function() {
                             const runningServer: Server = this;
                             agent.post("localhost:3030")
@@ -46,7 +47,7 @@ describe("operation", () => {
                     express()
                         .use(json())
                         .use(operation)
-                        .use(success)
+                        .use(success())
                         .listen(3030, function() {
                             const runningServer: Server = this;
                             agent.post("localhost:3030")
@@ -75,6 +76,7 @@ describe("operation", () => {
                     express()
                         .use(json())
                         .use(operation)
+                        .use(success())
                         .listen(3030, function() {
                             const runningServer: Server = this;
                             agent.post("localhost:3030")
@@ -104,7 +106,7 @@ describe("operation", () => {
                     express()
                         .use(json())
                         .use(operation)
-                        .use(success)
+                        .use(success())
                         .listen(3030, function() {
                             const runningServer: Server = this;
                             agent.post("localhost:3030")
@@ -120,8 +122,78 @@ describe("operation", () => {
                 });
             });
     });
+
+    it("should reject with 401 if response.locals.boards is an invalid facebook token", () => {
+        const abstractOperation: AbstractOperation = { module: "validation", schema: "facebook-token" };
+        const credential = { userId: "some-user-id" };
+        const facebookToken: FacebookToken = {} as FacebookToken;
+
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(updateBoards(facebookToken))
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(credential)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(401);
+                                    response.text.should.equal("Ugyldigt Facebook-login");
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
+    it("should continue to next operation if response.locals.boards is a valid facebook token", () => {
+        const abstractOperation: AbstractOperation = { module: "validation", schema: "facebook-token" };
+        const credential = { userId: "some-user-id" };
+
+        const expirationDate = (new Date().getTime() / 1000) + 60;
+        const facebookToken: FacebookToken = { is_valid: true, app_id: "1092068880930122", expires_at: expirationDate, user_id: "some-user-id" };
+
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(updateBoards(facebookToken))
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(credential)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(200);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
 });
 
-const success: RequestHandler = (request, response, next) => {
-    response.status(200).end();
+const updateBoards: (boards: any) => RequestHandler = (boards) => {
+    return (request, response, next) => {
+        response.locals.boards = boards;
+        next();
+    };
+};
+
+const success: () => RequestHandler = () => {
+    return (request, response, next) => {
+        response.status(200).end();
+    };
 };
