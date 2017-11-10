@@ -32,5 +32,15 @@
             { "module": "mongo-store", "collection": "Users" },
             { "module": "response", "status": 201 }
         ]
+    },
+    {
+        "method": "POST",
+        "path": "/user/facebook/get",
+        "operations": [
+            { "module": "facebook-inspect" },
+            { "module": "validation", "schema": "facebook-token" },
+            { "module": "mongo-lookup-one" },
+            { "module": "response", "status": 200 }
+        ]
     }
 ]
