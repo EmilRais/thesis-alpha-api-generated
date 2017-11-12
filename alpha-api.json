@@ -42,5 +42,16 @@
             { "module": "mongo-lookup-one" },
             { "module": "response", "status": 200 }
         ]
+    },
+    {
+        "method": "POST",
+        "path": "/user/facebook/extend-token",
+        "operations": [
+            { "module": "facebook-inspect" },
+            { "module": "validation", "schema": "facebook-token" },
+            { "module": "mongo-lookup-one" },
+            { "module": "facebook-extend" },
+            { "module": "response", "status": 200 }
+        ]
     }
 ]
