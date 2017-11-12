@@ -5,6 +5,7 @@ COPY mongo-lookup /alpha-api/mongo-lookup
 COPY mongo-lookup-one /alpha-api/mongo-lookup-one
 COPY mongo-store /alpha-api/mongo-store
 COPY facebook-inspect /alpha-api/facebook-inspect
+COPY facebook-extend /alpha-api/facebook-extend
 COPY response /alpha-api/response
 COPY alpha-api.json /alpha-api/alpha-api.json
 
