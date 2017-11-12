@@ -53,5 +53,16 @@
             { "module": "facebook-extend" },
             { "module": "response", "status": 200 }
         ]
+    },
+    {
+        "method": "POST",
+        "path": "/user/facebook/edit",
+        "operations": [
+            { "module": "facebook-inspect" },
+            { "module": "validation", "schema": "facebook-token" },
+            { "module": "mongo-lookup-one" },
+            { "module": "mongo-update" },
+            { "module": "response", "status": 200 }
+        ]
     }
 ]
