@@ -3,10 +3,14 @@ import { MongoClient, ObjectId } from "mongodb";
 
 export interface AbstractOperation {
     module: string;
+    collection: string;
     host?: string;
 }
 
 export const prepareOperation = (abstractOperation: AbstractOperation) => {
+    const collection = abstractOperation.collection;
+    if ( !collection ) return Promise.reject("mongo-update expected a collection");
+
     const host = abstractOperation.host || "mongo";
 
     return MongoClient.connect(`mongodb://${host}:27017/database`)
@@ -23,7 +27,7 @@ export const prepareOperation = (abstractOperation: AbstractOperation) => {
 
                 const options = { returnOriginal: false };
 
-                database.collection("Users").findOneAndUpdate(filter, update, options)
+                database.collection(collection).findOneAndUpdate(filter, update, options)
                     .then(result => {
                         response.locals.boards = result.value;
                         next();

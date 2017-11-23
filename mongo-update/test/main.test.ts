@@ -24,8 +24,15 @@ describe("operation", () => {
         return database.close();
     });
 
+    it("should fail if collection has not been specified", () => {
+        const abstractOperation: AbstractOperation = { module: "mongo-update", collection: null, host: "localhost" };
+        return prepareOperation(abstractOperation)
+            .then(() => Promise.reject("Expected failure"))
+            .catch(error => error.should.equal("mongo-update expected a collection"));
+    });
+
     it("should update user's credential", () => {
-        const abstractOperation: AbstractOperation = { module: "mongo-update", host: "localhost" };
+        const abstractOperation: AbstractOperation = { module: "mongo-update", collection: "Users", host: "localhost" };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
@@ -64,12 +71,8 @@ describe("operation", () => {
             });
     });
 
-    // insert user into database
-    // set user into response.locals.boards
-    // call operation with some other credential
-    // the returned user should have its credential changed
     it("should store updated object in response.locals.boards", () => {
-        const abstractOperation: AbstractOperation = { module: "mongo-update", host: "localhost" };
+        const abstractOperation: AbstractOperation = { module: "mongo-update", collection: "Users", host: "localhost" };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
