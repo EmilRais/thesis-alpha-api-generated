@@ -15,6 +15,7 @@
         "object-literal-shorthand": false,
         "object-literal-sort-keys": false,
         "no-console": [false],
+        "no-eval": false,
         "max-classes-per-file": [false],
         "interface-name": [true, "never-prefix"],
         "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
