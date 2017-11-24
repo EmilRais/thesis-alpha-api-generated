@@ -61,7 +61,7 @@
             { "module": "facebook-inspect" },
             { "module": "validation", "schema": "facebook-token" },
             { "module": "mongo-lookup-one" },
-            { "module": "mongo-update" },
+            { "module": "mongo-update", "collection": "Users", "query": "queries/update-user.json" },
             { "module": "response", "status": 200 }
         ]
     }

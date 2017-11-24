@@ -10,4 +10,6 @@ COPY facebook-extend /alpha-api/facebook-extend
 COPY response /alpha-api/response
 COPY alpha-api.json /alpha-api/alpha-api.json
 
+COPY queries /alpha-api/queries
+
 ENTRYPOINT ["node", "/speciale-tool", "/alpha-api/alpha-api.json"]

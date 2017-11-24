@@ -1,0 +1,6 @@
+{
+	"selector": { "_id": "response.locals.boards._id" },
+	"update": {
+		"$set": { "credential": "request.body" }
+	}
+}
