@@ -6,12 +6,12 @@ import * as express from "express";
 import { Server } from "http";
 import * as agent from "superagent";
 
-import { AbstractOperation, prepareOperation } from "../source/main";
+import { Operation, prepareOperation } from "../source/main";
 
 describe("operation", () => {
 
     it("should fail if status is missing", () => {
-        const abstractOperation: AbstractOperation = { module: "response", status: null };
+        const abstractOperation: Operation = { module: "response", status: null };
         return prepareOperation(abstractOperation)
             .then(() => Promise.reject("Expected failure"))
             .catch(error => {
@@ -20,7 +20,7 @@ describe("operation", () => {
     });
 
     it("should fail if status is not a number", () => {
-        const abstractOperation: AbstractOperation = { module: "response", status: "200" as any };
+        const abstractOperation: Operation = { module: "response", status: "200" as any };
         return prepareOperation(abstractOperation)
             .then(() => Promise.reject("Expected failure"))
             .catch(error => {
@@ -29,7 +29,7 @@ describe("operation", () => {
     });
 
     it("should return the specified status", () => {
-        const abstractOperation: AbstractOperation = { module: "response", status: 200 };
+        const abstractOperation: Operation = { module: "response", status: 200 };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
@@ -56,7 +56,7 @@ describe("operation", () => {
             { name: "board2" }
         ];
 
-        const abstractOperation: AbstractOperation = { module: "response", status: 200 };
+        const abstractOperation: Operation = { module: "response", status: 200 };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
