@@ -3,8 +3,8 @@
         "method": "GET",
         "path": "/board/get",
         "operations": [
-            { "module": "mongo-lookup", "collection": "Boards" },
-            { "module": "response", "status": 200 }
+            { "module": "../modules/mongo-lookup", "collection": "Boards" },
+            { "module": "../modules/response", "status": 200 }
         ]
     },
     {
@@ -12,16 +12,16 @@
         "path": "/board/create",
         "operations": [
             { "module": "validation", "schema": "board" },
-            { "module": "mongo-store", "collection": "Boards" },
-            { "module": "response", "status": 201 }
+            { "module": "../modules/mongo-store", "collection": "Boards" },
+            { "module": "../modules/response", "status": 201 }
         ]
     },
     {
         "method": "GET",
         "path": "/user/get",
         "operations": [
-            { "module": "mongo-lookup", "collection": "Users" },
-            { "module": "response", "status": 200 }
+            { "module": "../modules/mongo-lookup", "collection": "Users" },
+            { "module": "../modules/response", "status": 200 }
         ]
     },
     {
@@ -29,40 +29,40 @@
         "path": "/user/create/alpha-api",
         "operations": [
             { "module": "validation", "schema": "user" },
-            { "module": "mongo-store", "collection": "Users" },
-            { "module": "response", "status": 201 }
+            { "module": "../modules/mongo-store", "collection": "Users" },
+            { "module": "../modules/response", "status": 201 }
         ]
     },
     {
         "method": "POST",
         "path": "/user/facebook/get",
         "operations": [
-            { "module": "facebook-inspect" },
+            { "module": "../modules/facebook-inspect" },
             { "module": "validation", "schema": "facebook-token" },
-            { "module": "mongo-lookup-one" },
-            { "module": "response", "status": 200 }
+            { "module": "../modules/mongo-lookup-one" },
+            { "module": "../modules/response", "status": 200 }
         ]
     },
     {
         "method": "POST",
         "path": "/user/facebook/extend-token",
         "operations": [
-            { "module": "facebook-inspect" },
+            { "module": "../modules/facebook-inspect" },
             { "module": "validation", "schema": "facebook-token" },
-            { "module": "mongo-lookup-one" },
-            { "module": "facebook-extend" },
-            { "module": "response", "status": 200 }
+            { "module": "../modules/mongo-lookup-one" },
+            { "module": "../modules/facebook-extend" },
+            { "module": "../modules/response", "status": 200 }
         ]
     },
     {
         "method": "POST",
         "path": "/user/facebook/edit",
         "operations": [
-            { "module": "facebook-inspect" },
+            { "module": "../modules/facebook-inspect" },
             { "module": "validation", "schema": "facebook-token" },
-            { "module": "mongo-lookup-one" },
-            { "module": "mongo-update", "collection": "Users", "query": "update-user.json" },
-            { "module": "response", "status": 200 }
+            { "module": "../modules/mongo-lookup-one" },
+            { "module": "../modules/mongo-update", "collection": "Users", "query": "update-user.json" },
+            { "module": "../modules/response", "status": 200 }
         ]
     }
 ]
