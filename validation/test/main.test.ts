@@ -7,13 +7,20 @@ import * as express from "express";
 import { Server } from "http";
 import * as agent from "superagent";
 
-import { AbstractOperation, FacebookToken, prepareOperation } from "../source/main";
+import { FacebookToken, Operation, prepareOperation } from "../source/main";
 
 describe("operation", () => {
 
+    it("should reject if invalid schema", () => {
+        const abstractOperation: Operation = { module: "validation", schema: "book" as any };
+        return prepareOperation(abstractOperation)
+            .then(() => Promise.reject("Expected failure"))
+            .catch(error => error.should.equal('validation could not recognise schema "book"'));
+    });
+
     it("should reject with 400 if input is invalid board", () => {
         const board = { name: "some-name", image: 42 };
-        const abstractOperation: AbstractOperation = { module: "validation", schema: "board" };
+        const abstractOperation: Operation = { module: "validation", schema: "board" };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
@@ -40,7 +47,7 @@ describe("operation", () => {
 
     it("should continue to next operation if input is valid board", () => {
         const board = { name: "some-name", image: "some-image" };
-        const abstractOperation: AbstractOperation = { module: "validation", schema: "board" };
+        const abstractOperation: Operation = { module: "validation", schema: "board" };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
@@ -69,7 +76,7 @@ describe("operation", () => {
             email: "some-invalid-email",
             credential: { type: "alpha-api", email: "some@email.dk", password: "some-password" }
         };
-        const abstractOperation: AbstractOperation = { module: "validation", schema: "user" };
+        const abstractOperation: Operation = { module: "validation", schema: "user" };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
@@ -99,7 +106,7 @@ describe("operation", () => {
             email: "some@email.dk",
             credential: { type: "alpha-api", email: "some@email.dk", password: "some-password" }
         };
-        const abstractOperation: AbstractOperation = { module: "validation", schema: "user" };
+        const abstractOperation: Operation = { module: "validation", schema: "user" };
         return prepareOperation(abstractOperation)
             .then(operation => {
                 return new Promise((resolve, reject) => {
@@ -124,7 +131,7 @@ describe("operation", () => {
     });
 
     it("should reject with 401 if response.locals.boards is an invalid facebook token", () => {
-        const abstractOperation: AbstractOperation = { module: "validation", schema: "facebook-token" };
+        const abstractOperation: Operation = { module: "validation", schema: "facebook-token" };
         const credential = { userId: "some-user-id" };
         const facebookToken: FacebookToken = {} as FacebookToken;
 
@@ -154,7 +161,7 @@ describe("operation", () => {
     });
 
     it("should continue to next operation if response.locals.boards is a valid facebook token", () => {
-        const abstractOperation: AbstractOperation = { module: "validation", schema: "facebook-token" };
+        const abstractOperation: Operation = { module: "validation", schema: "facebook-token" };
         const credential = { userId: "some-user-id" };
 
         const expirationDate = (new Date().getTime() / 1000) + 60;
