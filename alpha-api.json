@@ -25,6 +25,14 @@
         ]
     },
     {
+    	"method": "POST",
+    	"path": "/post/update",
+    	"operations": [
+    		{ "module": "../modules/mongo-update-one", "collection": "Posts", "query": "update-post.json" },
+    		{ "module": "../modules/response", "status": 200 }
+    	]
+    },
+    {
         "method": "POST",
         "path": "/user/create/alpha-api",
         "operations": [

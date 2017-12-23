@@ -1,0 +1,6 @@
+{
+	"selector": { "_id": "request.body._id" },
+	"update": {
+		"$set": "request.body"
+	}
+}
