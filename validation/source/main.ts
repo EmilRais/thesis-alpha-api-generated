@@ -7,7 +7,7 @@ import { UserRule } from "./user.rule";
 
 export interface Operation {
     module: string;
-    schema: Schema;
+    schema: "board" | "user" | "facebook-token";
 }
 
 export interface FacebookToken {
@@ -16,8 +16,6 @@ export interface FacebookToken {
     expires_at: number;
     user_id: string;
 }
-
-type Schema = "board" | "user" | "facebook-token";
 
 const boardHandler: RequestHandler = (request, response, next) => {
     BoardRule().guard(request.body)
