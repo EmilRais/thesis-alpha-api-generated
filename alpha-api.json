@@ -4,7 +4,7 @@
         "path": "/board/get",
         "operations": [
             { "module": "../modules/mongo-lookup", "collection": "Boards" },
-            { "module": "../modules/response", "status": 200 }
+            { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
         ]
     },
     {
@@ -13,7 +13,7 @@
         "operations": [
             { "module": "validation", "schema": "board" },
             { "module": "../modules/mongo-store", "collection": "Boards" },
-            { "module": "../modules/response", "status": 201 }
+            { "module": "../modules/response", "status": 201, "body": null }
         ]
     },
     {
@@ -21,7 +21,7 @@
         "path": "/user/get",
         "operations": [
             { "module": "../modules/mongo-lookup", "collection": "Users" },
-            { "module": "../modules/response", "status": 200 }
+            { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
         ]
     },
     {
@@ -29,7 +29,21 @@
     	"path": "/post/update",
     	"operations": [
     		{ "module": "../modules/mongo-update-one", "collection": "Posts", "query": "update-post.json" },
-    		{ "module": "../modules/response", "status": 200 }
+    		{ "module": "../modules/response", "status": 200, "body": null }
+    	]
+    },
+    {
+    	"method": "POST",
+    	"path": "/post/delete/:id",
+    	"operations": [
+    	    {
+                "module": "../modules/mongo-delete-one",
+                "collection": "Posts",
+                "query": "delete-post.json",
+                "error": 500,
+                "errorMessage": ""
+            },
+    		{ "module": "../modules/response", "status": 200, "body": null }
     	]
     },
     {
@@ -38,7 +52,7 @@
         "operations": [
             { "module": "validation", "schema": "user" },
             { "module": "../modules/mongo-store", "collection": "Users" },
-            { "module": "../modules/response", "status": 201 }
+            { "module": "../modules/response", "status": 201, "body": "response.locals.boards" }
         ]
     },
     {
@@ -48,7 +62,7 @@
             { "module": "../modules/facebook-inspect" },
             { "module": "validation", "schema": "facebook-token" },
             { "module": "../modules/mongo-lookup-one" },
-            { "module": "../modules/response", "status": 200 }
+            { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
         ]
     },
     {
@@ -59,7 +73,7 @@
             { "module": "validation", "schema": "facebook-token" },
             { "module": "../modules/mongo-lookup-one" },
             { "module": "../modules/facebook-extend" },
-            { "module": "../modules/response", "status": 200 }
+            { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
         ]
     },
     {
@@ -70,7 +84,7 @@
             { "module": "validation", "schema": "facebook-token" },
             { "module": "../modules/mongo-lookup-one" },
             { "module": "../modules/mongo-update-one", "collection": "Users", "query": "update-user.json" },
-            { "module": "../modules/response", "status": 200 }
+            { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
         ]
     }
 ]
