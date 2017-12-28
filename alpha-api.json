@@ -41,7 +41,7 @@
                 "collection": "Posts",
                 "query": "delete-post.json",
                 "error": 500,
-                "errorMessage": ""
+                "errorMessage": null
             },
     		{ "module": "../modules/response", "status": 200, "body": null }
     	]
