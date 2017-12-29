@@ -3,7 +3,7 @@
         "method": "GET",
         "path": "/board/get",
         "operations": [
-            { "module": "../modules/mongo-lookup", "collection": "Boards" },
+            { "module": "../modules/mongo-lookup", "collection": "Boards", "query": "all-documents.json" },
             { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
         ]
     },
@@ -20,7 +20,7 @@
         "method": "GET",
         "path": "/user/get",
         "operations": [
-            { "module": "../modules/mongo-lookup", "collection": "Users" },
+            { "module": "../modules/mongo-lookup", "collection": "Users", "query": "all-documents.json" },
             { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
         ]
     },

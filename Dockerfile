@@ -9,5 +9,6 @@ COPY alpha-api-generated/update-post.json /alpha-api/update-post.json
 COPY alpha-api-generated/delete-post.json /alpha-api/delete-post.json
 COPY alpha-api-generated/alpha-api-user.json /alpha-api/alpha-api-user.json
 COPY alpha-api-generated/facebook-user.json /alpha-api/facebook-user.json
+COPY alpha-api-generated/all-documents.json /alpha-api/all-documents.json
 
 ENTRYPOINT ["node", "/speciale-tool", "/alpha-api/alpha-api.json"]
