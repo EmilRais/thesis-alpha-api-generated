@@ -17,6 +17,17 @@
         ]
     },
     {
+        "method": "POST",
+        "path": "/post/create",
+        "operations": [
+            { "module": "../modules/mongo-lookup-one", "collection": "Users", "query": "post-owner.json", "error": 400, "errorMessage": "'Brugeren eksisterer ikke'" },
+            { "module": "../modules/mongo-lookup-one", "collection": "Boards", "query": "post-board.json", "error": 400, "errorMessage": "'Opslagstavle eksisterer ikke'" },
+            { "module": "validation", "schema": "post" },
+            { "module": "../modules/mongo-store", "collection": "Posts" },
+            { "module": "../modules/response", "status": 201, "body": null }
+        ]
+    },
+    {
     	"method": "POST",
     	"path": "/post/update",
     	"operations": [
