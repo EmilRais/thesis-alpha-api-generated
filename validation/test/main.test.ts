@@ -190,6 +190,65 @@ describe("operation", () => {
                 });
             });
     });
+
+    it("should reject with Unauthorized if not matching login", () => {
+        const abstractOperation: Operation = { module: "validation", schema: "matching-login" };
+        const credential = { password: "some-password" };
+        const user = { credential: { password: "some-other-password" } };
+
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(updateBoards(user))
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(credential)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(401);
+                                    response.text.should.equal("Forkert kodeord");
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
+    it("should proceed to next operation if matching login", () => {
+        const abstractOperation: Operation = { module: "validation", schema: "matching-login" };
+        const credential = { password: "some-password" };
+        const user = { credential: { password: "some-password" } };
+
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(updateBoards(user))
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(credential)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(200);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
 });
 
 const updateBoards: (boards: any) => RequestHandler = (boards) => {
