@@ -88,7 +88,7 @@
         "method": "POST",
         "path": "/user/facebook/get",
         "operations": [
-            { "module": "../modules/facebook-inspect" },
+            { "module": "../modules/facebook-inspect", "token": "request.body.token" },
             { "module": "validation", "schema": "facebook-token" },
             { "module": "../modules/mongo-lookup-one", "collection": "Users", "query": "facebook-user.json", "error": 406, "errorMessage": "'Bruger ikke oprettet'" },
             { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
@@ -98,7 +98,7 @@
         "method": "POST",
         "path": "/user/facebook/extend-token",
         "operations": [
-            { "module": "../modules/facebook-inspect" },
+            { "module": "../modules/facebook-inspect", "token": "request.body.token" },
             { "module": "validation", "schema": "facebook-token" },
             { "module": "../modules/mongo-lookup-one", "collection": "Users", "query": "facebook-user.json", "error": 406, "errorMessage": "'Bruger ikke oprettet'" },
             { "module": "../modules/facebook-extend" },
@@ -109,7 +109,7 @@
         "method": "POST",
         "path": "/user/facebook/edit",
         "operations": [
-            { "module": "../modules/facebook-inspect" },
+            { "module": "../modules/facebook-inspect", "token": "request.body.token" },
             { "module": "validation", "schema": "facebook-token" },
             { "module": "../modules/mongo-lookup-one", "collection": "Users", "query": "facebook-user.json", "error": 406, "errorMessage": "'Bruger ikke oprettet'" },
             { "module": "../modules/mongo-update-one", "collection": "Users", "query": "update-user.json" },
