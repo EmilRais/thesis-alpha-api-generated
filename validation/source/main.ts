@@ -3,11 +3,12 @@ import { Rule } from "paradise";
 
 import { BoardRule } from "./board.rule";
 import { FacebookTokenRule } from "./facebook-token.rule";
+import { PostRule } from "./post.rule";
 import { UserRule } from "./user.rule";
 
 export interface Operation {
     module: string;
-    schema: "facebook-token" | "board" | "user" | "matching-login";
+    schema: "facebook-token" | "board" | "user" | "post" | "matching-login";
 }
 
 export interface FacebookToken {
@@ -26,6 +27,12 @@ const facebookTokenHandler: RequestHandler = (request, response, next) => {
 
 const boardHandler: RequestHandler = (request, response, next) => {
     BoardRule().guard(request.body)
+        .then(() => next())
+        .catch(error => response.status(400).json(error));
+};
+
+const postHandler: RequestHandler = (request, response, next) => {
+    PostRule().guard(request.body)
         .then(() => next())
         .catch(error => response.status(400).json(error));
 };
@@ -53,6 +60,7 @@ export const prepareOperation = (operation: Operation) => {
         case "facebook-token": return Promise.resolve(facebookTokenHandler);
         case "board": return Promise.resolve(boardHandler);
         case "user": return Promise.resolve(userHandler);
+        case "post": return Promise.resolve(postHandler);
         case "matching-login": return Promise.resolve(matchingLoginHandler);
         default: return Promise.reject(`validation could not recognise schema "${operation.schema}"`);
     }

@@ -191,6 +191,63 @@ describe("operation", () => {
             });
     });
 
+    it("should reject with 400 if post is invalid", () => {
+        const abstractOperation: Operation = { module: "validation", schema: "post" };
+        const location = { latitude: 42, longitude: 1337, name: "some-name", city: "some-city", postalCode: "some-postal-code" };
+        const post = { description: "some-long-description", kind: "LOST", date: 0, image: "some-image", location: location };
+
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(post)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(400);
+                                    response.body.should.deep.equal(['"$.title" was missing']);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
+    it("should continue to next operation if post is valid", () => {
+        const abstractOperation: Operation = { module: "validation", schema: "post" };
+        const location = { latitude: 42, longitude: 1337, name: "some-name", city: "some-city", postalCode: "some-postal-code" };
+        const post = { title: "some-title", description: "some-long-description", kind: "LOST", date: 0, image: "some-image", location: location };
+
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(post)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(200);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
     it("should reject with Unauthorized if not matching login", () => {
         const abstractOperation: Operation = { module: "validation", schema: "matching-login" };
         const credential = { password: "some-password" };
