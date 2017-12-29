@@ -1,0 +1,3 @@
+{
+	"selector": { "board._id": "request.query.id" }
+}

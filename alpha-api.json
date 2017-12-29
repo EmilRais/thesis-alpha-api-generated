@@ -17,14 +17,6 @@
         ]
     },
     {
-        "method": "GET",
-        "path": "/user/get",
-        "operations": [
-            { "module": "../modules/mongo-lookup", "collection": "Users", "query": "all-documents.json" },
-            { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
-        ]
-    },
-    {
     	"method": "POST",
     	"path": "/post/update",
     	"operations": [
@@ -45,6 +37,23 @@
             },
     		{ "module": "../modules/response", "status": 200, "body": null }
     	]
+    },
+    {
+	    "method": "GET",
+	    "path": "/post/get/board",
+	    "operations": [
+	        { "module": "../modules/mongo-lookup-one", "collection": "Boards", "query": "by-id.json", "error": 400, "errorMessage": "'Opslagstavlen eksisterer ikke'" },
+	        { "module": "../modules/mongo-lookup", "collection": "Posts", "query": "board-posts.json" },
+	        { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
+	    ]
+	},
+    {
+        "method": "GET",
+        "path": "/user/get",
+        "operations": [
+            { "module": "../modules/mongo-lookup", "collection": "Users", "query": "all-documents.json" },
+            { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
+        ]
     },
     {
         "method": "POST",
