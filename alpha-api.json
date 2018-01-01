@@ -101,8 +101,8 @@
             { "module": "../modules/facebook-inspect", "token": "request.body.token" },
             { "module": "validation", "schema": "facebook-token" },
             { "module": "../modules/mongo-lookup-one", "collection": "Users", "query": "facebook-user.json", "error": 406, "errorMessage": "'Bruger ikke oprettet'" },
-            { "module": "../modules/facebook-extend", "token": "request.body.token" },
-            { "module": "../modules/response", "status": 200, "body": "response.locals.boards" }
+            { "module": "../modules/facebook-extend", "token": "request.body.token", "output": "response.locals.longLivedToken" },
+            { "module": "../modules/response", "status": 200, "body": "response.locals.longLivedToken" }
         ]
     },
     {
