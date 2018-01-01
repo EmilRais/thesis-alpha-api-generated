@@ -31,7 +31,7 @@ const userFacebookTokenHandler: RequestHandler = (request, response, next) => {
     FacebookTokenRule(new Date().getTime() / 1000).guard(response.locals.boards)
         .then(() => userCredential.userId === response.locals.boards.user_id ? Promise.resolve() : Promise.reject("User id mismatch"))
         .then(() => next())
-        .catch(error => response.status(401).end("Ugyldigt Facebook-login"));
+        .catch(error => response.status(400).end("Ugyldigt Facebook-login"));
 };
 
 const boardHandler: RequestHandler = (request, response, next) => {

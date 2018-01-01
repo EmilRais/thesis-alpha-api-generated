@@ -280,7 +280,7 @@ describe("operation", () => {
             });
     });
 
-    it("should reject with 401 if response.locals.boards is an invalid facebook token", () => {
+    it("should reject with 400 if response.locals.boards is an invalid facebook token", () => {
         const abstractOperation: Operation = { module: "validation", schema: "user-facebook-token" };
         const credential = { userId: "some-user-id" };
         const user = { credential: credential };
@@ -301,7 +301,7 @@ describe("operation", () => {
                                 .catch(error => error.response)
                                 .then(response => {
                                     runningServer.close();
-                                    response.status.should.equal(401);
+                                    response.status.should.equal(400);
                                     response.text.should.equal("Ugyldigt Facebook-login");
                                     resolve();
                                 })
