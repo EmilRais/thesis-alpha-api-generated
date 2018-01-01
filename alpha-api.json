@@ -76,6 +76,18 @@
         ]
     },
     {
+	    "method": "POST",
+	    "path": "/user/create/facebook",
+	    "operations": [
+	        { "module": "validation", "schema": "facebook-user" },
+	        { "module": "../modules/facebook-inspect", "token": "request.body.credential.token" },
+	        { "module": "validation", "schema": "user-facebook-token" },
+	        { "module": "../modules/facebook-extend", "token": "request.body.credential.token", "output": "request.body.credential.token" },
+	        { "module": "../modules/mongo-store", "collection": "Users" },
+	        { "module": "../modules/response", "status": 201, "body": "response.locals.boards" }
+	    ]
+	},
+    {
         "method": "POST",
         "path": "/user/login/alpha-api",
         "operations": [
