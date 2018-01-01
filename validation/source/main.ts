@@ -8,7 +8,7 @@ import { UserRule } from "./user.rule";
 
 export interface Operation {
     module: string;
-    schema: "facebook-token" | "user-facebook-token" | "board" | "user" | "post" | "matching-login";
+    schema: "facebook-token" | "user-facebook-token" | "board" | "user" | "facebook-user" | "post" | "matching-login";
 }
 
 export interface FacebookToken {
@@ -52,6 +52,13 @@ const userHandler: RequestHandler = (request, response, next) => {
         .catch(error => response.status(400).json(error));
 };
 
+const facebookUserHandler: RequestHandler = (request, response, next) => {
+    UserRule().guard(request.body)
+        .then(() => request.body.credential.type === "facebook" ? Promise.resolve() : Promise.reject("Ugyldigt Facebook-login"))
+        .then(() => next())
+        .catch(error => response.status(400).json(error));
+};
+
 const matchingLoginHandler: RequestHandler = (request, response, next) => {
     const specifiedPassword = request.body.password;
     const actualPassword = response.locals.boards.credential.password;
@@ -70,6 +77,7 @@ export const prepareOperation = (operation: Operation) => {
         case "user-facebook-token": return Promise.resolve(userFacebookTokenHandler);
         case "board": return Promise.resolve(boardHandler);
         case "user": return Promise.resolve(userHandler);
+        case "facebook-user": return Promise.resolve(facebookUserHandler);
         case "post": return Promise.resolve(postHandler);
         case "matching-login": return Promise.resolve(matchingLoginHandler);
         default: return Promise.reject(`validation could not recognise schema "${operation.schema}"`);

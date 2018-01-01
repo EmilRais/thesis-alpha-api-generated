@@ -130,6 +130,95 @@ describe("operation", () => {
             });
     });
 
+    it("should reject with 400 if input is invalid facebook user", () => {
+        const user = {
+            email: "some-invalid-email",
+            credential: { type: "facebook", userId: "some-user-id", token: "some-token" }
+        };
+        const abstractOperation: Operation = { module: "validation", schema: "facebook-user" };
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(user)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(400);
+                                    response.body.should.deep.equal(['"$.email" was not an email address']);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
+    it("should reject with 400 if input is regular user", () => {
+        const user = {
+            email: "some@email.dk",
+            credential: { type: "alpha-api", email: "some@email.dk", password: "some-password" }
+        };
+        const abstractOperation: Operation = { module: "validation", schema: "facebook-user" };
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(user)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(400);
+                                    response.body.should.deep.equal("Ugyldigt Facebook-login");
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
+    it("should continue to next operation if input is valid facebook user", () => {
+        const user = {
+            email: "some@email.dk",
+            credential: { type: "facebook", userId: "some-user-id", token: "some-token" }
+        };
+        const abstractOperation: Operation = { module: "validation", schema: "facebook-user" };
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(user)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(200);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
     it("should reject with 401 if response.locals.boards is an invalid facebook token", () => {
         const abstractOperation: Operation = { module: "validation", schema: "facebook-token" };
         const credential = { userId: "some-user-id" };
