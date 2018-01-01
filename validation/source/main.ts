@@ -8,7 +8,7 @@ import { UserRule } from "./user.rule";
 
 export interface Operation {
     module: string;
-    schema: "facebook-token" | "board" | "user" | "post" | "matching-login";
+    schema: "facebook-token" | "user-facebook-token" | "board" | "user" | "post" | "matching-login";
 }
 
 export interface FacebookToken {
@@ -19,8 +19,17 @@ export interface FacebookToken {
 }
 
 const facebookTokenHandler: RequestHandler = (request, response, next) => {
+    const userCredential = request.body;
     FacebookTokenRule(new Date().getTime() / 1000).guard(response.locals.boards)
-        .then(() => request.body.userId === response.locals.boards.user_id ? Promise.resolve() : Promise.reject("User id mismatch"))
+        .then(() => userCredential.userId === response.locals.boards.user_id ? Promise.resolve() : Promise.reject("User id mismatch"))
+        .then(() => next())
+        .catch(error => response.status(401).end("Ugyldigt Facebook-login"));
+};
+
+const userFacebookTokenHandler: RequestHandler = (request, response, next) => {
+    const userCredential = request.body.credential;
+    FacebookTokenRule(new Date().getTime() / 1000).guard(response.locals.boards)
+        .then(() => userCredential.userId === response.locals.boards.user_id ? Promise.resolve() : Promise.reject("User id mismatch"))
         .then(() => next())
         .catch(error => response.status(401).end("Ugyldigt Facebook-login"));
 };
@@ -58,6 +67,7 @@ export const prepareOperation = (operation: Operation) => {
 
     switch ( operation.schema ) {
         case "facebook-token": return Promise.resolve(facebookTokenHandler);
+        case "user-facebook-token": return Promise.resolve(userFacebookTokenHandler);
         case "board": return Promise.resolve(boardHandler);
         case "user": return Promise.resolve(userHandler);
         case "post": return Promise.resolve(postHandler);

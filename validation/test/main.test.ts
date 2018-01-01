@@ -191,6 +191,69 @@ describe("operation", () => {
             });
     });
 
+    it("should reject with 401 if response.locals.boards is an invalid facebook token", () => {
+        const abstractOperation: Operation = { module: "validation", schema: "user-facebook-token" };
+        const credential = { userId: "some-user-id" };
+        const user = { credential: credential };
+        const facebookToken: FacebookToken = {} as FacebookToken;
+
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(updateBoards(facebookToken))
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(user)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(401);
+                                    response.text.should.equal("Ugyldigt Facebook-login");
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
+    it("should continue to next operation if response.locals.boards is a valid facebook token", () => {
+        const abstractOperation: Operation = { module: "validation", schema: "user-facebook-token" };
+        const credential = { userId: "some-user-id" };
+        const user = { credential: credential };
+
+        const expirationDate = (new Date().getTime() / 1000) + 60;
+        const facebookToken: FacebookToken = { is_valid: true, app_id: "1092068880930122", expires_at: expirationDate, user_id: "some-user-id" };
+
+        return prepareOperation(abstractOperation)
+            .then(operation => {
+                return new Promise((resolve, reject) => {
+                    express()
+                        .use(json())
+                        .use(updateBoards(facebookToken))
+                        .use(operation)
+                        .use(success())
+                        .listen(3030, function() {
+                            const runningServer: Server = this;
+                            agent.post("localhost:3030")
+                                .send(user)
+                                .catch(error => error.response)
+                                .then(response => {
+                                    runningServer.close();
+                                    response.status.should.equal(200);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        });
+                });
+            });
+    });
+
     it("should reject with 400 if post is invalid", () => {
         const abstractOperation: Operation = { module: "validation", schema: "post" };
         const location = { latitude: 42, longitude: 1337, name: "some-name", city: "some-city", postalCode: "some-postal-code" };
