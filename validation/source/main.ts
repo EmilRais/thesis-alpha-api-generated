@@ -54,8 +54,12 @@ const userHandler: RequestHandler = (request, response, next) => {
 
 const facebookUserHandler: RequestHandler = (request, response, next) => {
     UserRule().guard(request.body)
-        .then(() => request.body.credential.type === "facebook" ? Promise.resolve() : Promise.reject("Ugyldigt Facebook-login"))
-        .then(() => next())
+        .then(() => {
+            if ( request.body.credential.type !== "facebook" )
+                response.status(400).end("Ugyldigt Facebook-login");
+
+            next();
+        })
         .catch(error => response.status(400).json(error));
 };
 

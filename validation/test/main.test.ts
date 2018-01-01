@@ -181,7 +181,7 @@ describe("operation", () => {
                                 .then(response => {
                                     runningServer.close();
                                     response.status.should.equal(400);
-                                    response.body.should.deep.equal("Ugyldigt Facebook-login");
+                                    response.text.should.equal("Ugyldigt Facebook-login");
                                     resolve();
                                 })
                                 .catch(reject);
