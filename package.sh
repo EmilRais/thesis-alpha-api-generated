@@ -1,1 +1,1 @@
-docker build -t emilrais/alpha-api-generated -f Dockerfile ..
+docker build -t emilrais/thesis-alpha-api-generated -f Dockerfile ..
